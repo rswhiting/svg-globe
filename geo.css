@@ -12,23 +12,20 @@ body {
 
   @keyframes pulse {
    0% {
-     opacity: 1;
-     r: 3px;
-   }
-   60% {
-     opacity: 0;
-     r: 10px;
+     opacity: 0.1;
+     r: 20px;
    }
    100% {
      opacity: 1;
-     r: 3px;
+     r: 2px;
    }
  }
 
  circle {
    fill: #F00; 
    /* animation: pulse 2s ease infinite; */
-   animation: pulse 2s ease forwards;
-   animation-iteration-count: 3;
-   r: 3px;
+   animation: pulse 1s;
+   animation-iteration-count: 5;
+   animation-direction: alternate;
+   r: 2px;
  }

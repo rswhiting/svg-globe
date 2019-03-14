@@ -1,7 +1,7 @@
 
 start the server
 ```
-python -m SimpleHTTPServer 8001
+python -m SimpleHTTPServer 8000
 ```
 Console add events:
 ```

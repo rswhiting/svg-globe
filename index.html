@@ -33,18 +33,30 @@
         drawGlobe();
         enableRotation();
 
+        const startTime = new Date().getTime() / 1000.0;
+        const defaultLocations = [
+            { "latitude": 22, "longitude": 88, "st": startTime },
+            { "latitude": 12.61315, "longitude": 38.37723, "st": startTime },
+            { "latitude": -30, "longitude": -58, "st": startTime },
+            { "latitude": -14.270972, "longitude": -170.132217, "st": startTime },
+            { "latitude": 28.033886, "longitude": 1.659626, "st": startTime },
+            { "latitude": 40.463667, "longitude": -3.74922, "st": startTime },
+            { "latitude": 35.907757, "longitude": 127.766922, "st": startTime },
+            { "latitude": 23.634501, "longitude": -102.552784, "st": startTime }
+        ];
+
         function drawGlobe() {
             d3.queue()
-                .defer(d3.json, 'https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-110m.json')
-                .defer(d3.json, 'locations.json')
-                .await((error, worldData, locationData) => {
+                .defer(d3.json, 'world-110m.json')
+                // .defer(d3.json, defaultLocations)
+                .await((error, worldData) => {
                     svg.selectAll(".segment")
                         .data(topojson.feature(worldData, worldData.objects.countries).features)
                         .enter().append("path")
                         .attr("class", "segment")
                         .attr("d", path)
                         .style("fill", (d, i) => '#777')
-                    locations = locationData;
+                    locations = defaultLocations;
                     drawMarkers();
                 });
         }
