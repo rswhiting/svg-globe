@@ -1,0 +1,88 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- <script type="text/javascript" src="d3.v3.min.js"></script> -->
+    <link href="/geo.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+</head>
+
+<body>
+    <svg id="globe"></svg>
+    <script>
+        const margin = 20;
+        const size = 1000;
+        const width = size;
+        const height = size;
+        const config = {
+            speed: 0.005,
+            verticalTilt: -20,
+            horizontalTilt: -13.4
+        }
+        let locations = [];
+        const svg = d3.select('#globe')
+            .attr('width', width).attr('height', height);
+        const markerGroup = svg.append('g');
+        const projection = d3.geoOrthographic()
+        projection.scale(size / 2 - margin);
+        projection.translate([size / 2, size / 2]);
+        const path = d3.geoPath().projection(projection);
+        const center = [width / 2, height / 2];
+
+        drawGlobe();
+        enableRotation();
+
+        function drawGlobe() {
+            d3.queue()
+                .defer(d3.json, 'https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-110m.json')
+                .defer(d3.json, 'locations.json')
+                .await((error, worldData, locationData) => {
+                    svg.selectAll(".segment")
+                        .data(topojson.feature(worldData, worldData.objects.countries).features)
+                        .enter().append("path")
+                        .attr("class", "segment")
+                        .attr("d", path)
+                        .style("fill", (d, i) => '#777')
+                    locations = locationData;
+                    drawMarkers();
+                });
+        }
+
+        function enableRotation() {
+            d3.timer(function (elapsed) {
+                projection.rotate([config.speed * elapsed - 120, config.verticalTilt, config.horizontalTilt]);
+                svg.selectAll("path").attr("d", path);
+                drawMarkers();
+            });
+        }
+
+        function drawMarkers() {
+            const markers = markerGroup.selectAll('circle')
+                .data(locations);
+            markers
+                .enter()
+                .append('circle')
+                .merge(markers)
+                .attr('cx', d => projection([d.longitude, d.latitude])[0])
+                .attr('cy', d => projection([d.longitude, d.latitude])[1])
+                .attr('display', d => {
+                    const coordinate = [d.longitude, d.latitude];
+                    gdistance = d3.geoDistance(coordinate, projection.invert(center));
+                    return gdistance > 1.57 ? 'none' : 'inherit';
+                })
+                .style('animation-delay', d => {
+                    return d.st - new Date().getTime() / 1000.0 + "s";
+                })
+
+            markerGroup.each(function () {
+                this.parentNode.appendChild(this);
+            });
+        }
+    </script>
+    <!-- <svg height="100px" width="100px">
+        <circle cx="50%" cy="50%"></circle>
+    </svg> -->
+</body>
+
+</html>
